@@ -1,11 +1,13 @@
 import 'dart:async';
-import 'dart:html';
+import 'dart:js_interop';
+// import 'dart:html';
 import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:just_audio_platform_interface/just_audio_platform_interface.dart';
+import 'package:web/helpers.dart';
 
 /// The web implementation of [JustAudioPlatform].
 class JustAudioPlugin extends JustAudioPlatform {
@@ -99,7 +101,7 @@ abstract class JustAudioPlayer extends AudioPlayerPlatform {
 
 /// An HTML5-specific implementation of [JustAudioPlayer].
 class Html5AudioPlayer extends JustAudioPlayer {
-  final _audioElement = AudioElement();
+  final _audioElement = createAudioElement();
   late final _playPauseQueue = _PlayPauseQueue(_audioElement);
   Completer<dynamic>? _durationCompleter;
   AudioSourcePlayer? _audioSourcePlayer;
@@ -112,33 +114,33 @@ class Html5AudioPlayer extends JustAudioPlayer {
     _audioElement.addEventListener('durationchange', (event) {
       _durationCompleter?.complete();
       broadcastPlaybackEvent();
-    });
+    }.toJS);
     _audioElement.addEventListener('error', (event) {
       _durationCompleter?.completeError(_audioElement.error!);
-    });
+    }.toJS);
     _audioElement.addEventListener('ended', (event) async {
       _currentAudioSourcePlayer?.complete();
-    });
+    }.toJS);
     _audioElement.addEventListener('timeupdate', (event) {
       _currentAudioSourcePlayer
           ?.timeUpdated(_audioElement.currentTime as double);
-    });
+    }.toJS);
     _audioElement.addEventListener('loadstart', (event) {
       transition(ProcessingStateMessage.buffering);
-    });
+    }.toJS);
     _audioElement.addEventListener('waiting', (event) {
       transition(ProcessingStateMessage.buffering);
-    });
+    }.toJS);
     _audioElement.addEventListener('stalled', (event) {
       transition(ProcessingStateMessage.buffering);
-    });
+    }.toJS);
     _audioElement.addEventListener('canplaythrough', (event) {
       _audioElement.playbackRate = _speed;
       transition(ProcessingStateMessage.ready);
-    });
+    }.toJS);
     _audioElement.addEventListener('progress', (event) {
       broadcastPlaybackEvent();
-    });
+    }.toJS);
   }
 
   /// The current playback order, depending on whether shuffle mode is enabled.
