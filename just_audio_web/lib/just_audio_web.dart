@@ -965,7 +965,7 @@ class _PlayPauseQueue {
     await for (var request in _queue.stream) {
       try {
         if (request.playing) {
-          await audioElement.play();
+          await audioElement.play().toDart;
         } else {
           audioElement.pause();
         }
